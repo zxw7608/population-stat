@@ -11,7 +11,9 @@
       "Bash(node -e ' *)",
       "Bash(node -e \"console.log\\('package.json scripts:', require\\('./package.json'\\).scripts\\)\")",
       "Bash(gh auth *)",
-      "Bash(git push *)"
+      "Bash(git push *)",
+      "Bash(node *)",
+      "Bash(git reset *)"
     ]
   }
 }
