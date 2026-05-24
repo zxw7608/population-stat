@@ -65,6 +65,17 @@ const SimulationPanel = {
       return this.ageDistribution?.meta?.baseYear || 2000;
     }
   },
+  mounted() {
+    this._onTabShow = () => this.$nextTick(() => this.renderResultChart());
+    document.querySelectorAll('[data-bs-toggle="tab"]').forEach(tab =>
+      tab.addEventListener('shown.bs.tab', this._onTabShow)
+    );
+  },
+  beforeUnmount() {
+    document.querySelectorAll('[data-bs-toggle="tab"]').forEach(tab =>
+      tab.removeEventListener('shown.bs.tab', this._onTabShow)
+    );
+  },
   watch: {
     historyData: {
       handler() { this.resetRates(); this.runSimulation(); },
@@ -105,8 +116,12 @@ const SimulationPanel = {
       this.$nextTick(() => this.renderResultChart());
     },
     renderResultChart() {
-      if (!this.$refs.resultChart || !this.result) return;
-      const chart = echarts.init(this.$refs.resultChart);
+      if (!this.result) return;
+      const el = this.$refs.resultChart;
+      if (!el || el.clientWidth === 0) return;
+      let chart = echarts.getInstanceByDom(el);
+      if (chart) chart.dispose();
+      chart = echarts.init(el);
       const groups = classifyByGroups(this.result.distribution, this.ageGroups);
       chart.setOption({
         tooltip: { trigger: 'axis' },

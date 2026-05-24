@@ -18,6 +18,15 @@ const BirthDeathChart = {
   },
   mounted() {
     this.renderCharts();
+    this._onTabShow = () => this.$nextTick(() => this.renderCharts());
+    document.querySelectorAll('[data-bs-toggle="tab"]').forEach(tab =>
+      tab.addEventListener('shown.bs.tab', this._onTabShow)
+    );
+  },
+  beforeUnmount() {
+    document.querySelectorAll('[data-bs-toggle="tab"]').forEach(tab =>
+      tab.removeEventListener('shown.bs.tab', this._onTabShow)
+    );
   },
   methods: {
     renderCharts() {
@@ -25,7 +34,11 @@ const BirthDeathChart = {
       this.renderLineChart();
     },
     renderBarChart() {
-      const chart = echarts.init(this.$refs.barChart);
+      const el = this.$refs.barChart;
+      if (!el || el.clientWidth === 0) return;
+      let chart = echarts.getInstanceByDom(el);
+      if (chart) chart.dispose();
+      chart = echarts.init(el);
       const sorted = [...this.historyData].sort((a, b) => a.year - b.year);
       chart.setOption({
         tooltip: { trigger: 'axis' },
@@ -41,7 +54,11 @@ const BirthDeathChart = {
       });
     },
     renderLineChart() {
-      const chart = echarts.init(this.$refs.lineChart);
+      const el = this.$refs.lineChart;
+      if (!el || el.clientWidth === 0) return;
+      let chart = echarts.getInstanceByDom(el);
+      if (chart) chart.dispose();
+      chart = echarts.init(el);
       const sorted = [...this.historyData].sort((a, b) => a.year - b.year);
       chart.setOption({
         tooltip: { trigger: 'axis' },

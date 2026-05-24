@@ -31,10 +31,23 @@ const AgeDistribution = {
   },
   mounted() {
     if (this.ageDistribution) this.renderChart();
+    this._onTabShow = () => this.$nextTick(() => this.renderChart());
+    document.querySelectorAll('[data-bs-toggle="tab"]').forEach(tab =>
+      tab.addEventListener('shown.bs.tab', this._onTabShow)
+    );
+  },
+  beforeUnmount() {
+    document.querySelectorAll('[data-bs-toggle="tab"]').forEach(tab =>
+      tab.removeEventListener('shown.bs.tab', this._onTabShow)
+    );
   },
   methods: {
     renderChart() {
-      const chart = echarts.init(this.$refs.chart);
+      const el = this.$refs.chart;
+      if (!el || el.clientWidth === 0) return;
+      let chart = echarts.getInstanceByDom(el);
+      if (chart) chart.dispose();
+      chart = echarts.init(el);
       if (this.viewMode === 'group') {
         const dist = this.ageDistribution.ages.map(a => a.count);
         const groups = classifyByGroups(dist, this.ageGroups);
