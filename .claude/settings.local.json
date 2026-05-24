@@ -9,7 +9,9 @@
       "Bash(node -e \"const files=['src/engine/age-classifier.js','src/engine/population-engine.js','src/engine/data-parser.js','src/components/rate-input.js','src/components/birth-death-chart.js','src/components/age-distribution.js','src/components/age-group-editor.js','src/components/data-manager.js','src/components/simulation-panel.js','src/app.js']; files.forEach\\(f=>{try{require\\('fs'\\).readFileSync\\(f,'utf8'\\); console.log\\('OK:',f\\)}catch\\(e\\){console.log\\('MISSING:',f\\)}}\\)\")",
       "Bash(npm install *)",
       "Bash(node -e ' *)",
-      "Bash(node -e \"console.log\\('package.json scripts:', require\\('./package.json'\\).scripts\\)\")"
+      "Bash(node -e \"console.log\\('package.json scripts:', require\\('./package.json'\\).scripts\\)\")",
+      "Bash(gh auth *)",
+      "Bash(git push *)"
     ]
   }
 }
