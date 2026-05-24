@@ -11,7 +11,7 @@ const RateInput = {
       <label class="form-label">{{ label }}</label>
       <div class="input-group" style="max-width: 200px">
         <input type="number" class="form-control" :class="{ 'is-invalid': !valid }"
-               :value="modelValue" step="0.01" :min="min" :max="max"
+               :value="modelValue" step="1" :min="min" :max="max"
                @input="onInput">
         <span class="input-group-text">‰</span>
         <div class="invalid-feedback" v-if="!valid">

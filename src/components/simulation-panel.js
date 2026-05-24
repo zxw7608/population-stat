@@ -10,19 +10,15 @@ const SimulationPanel = {
         请先在"数据管理"页面上传年龄分布数据
       </div>
       <div v-else>
-        <div class="row mb-4">
-          <div class="col-md-4">
-            <rate-input label="推演出⽣率" v-model="birthRate" :min="0" :max="100"></rate-input>
-          </div>
-          <div class="col-md-4">
-            <rate-input label="推演死亡率" v-model="deathRate" :min="0" :max="100"></rate-input>
-          </div>
-          <div class="col-md-4 d-flex align-items-end">
+        <div class="d-flex gap-3 align-items-end mb-3 flex-wrap">
+          <rate-input label="推演出⽣率" v-model="birthRate" :min="0" :max="100"></rate-input>
+          <rate-input label="推演死亡率" v-model="deathRate" :min="0" :max="100"></rate-input>
+          <div class="pb-2">
             <button class="btn btn-sm btn-outline-secondary" @click="resetRates">重置为最末年数值</button>
           </div>
         </div>
 
-        <div class="mb-4">
+        <div class="mb-3">
           <label class="form-label">目标年份：<strong>{{ targetYear }}</strong></label>
           <input type="range" class="form-range" v-model.number="targetYear"
                  :min="sliderMin" :max="2100" step="1">
@@ -33,6 +29,25 @@ const SimulationPanel = {
             <button class="btn btn-outline-primary" @click="targetYear = 2100">2100年</button>
           </div>
         </div>
+
+        <details class="mb-3 small text-muted">
+          <summary class="user-select-none cursor-pointer">推演算法说明</summary>
+          <div class="card card-body bg-light mt-2">
+            <p class="mb-1"><strong>数据基准：</strong>{{ baseYear }} 年人口普查年龄分布（0-100+ 岁，共 101 个年龄槽位）。</p>
+            <p class="mb-1"><strong>两阶段推演：</strong></p>
+            <ul class="mb-1 ps-3">
+              <li><strong>阶段一（历史回放）</strong>：{{ baseYear }} → {{ currentYear }}，逐年使用实际历史出生率/死亡率驱动。</li>
+              <li><strong>阶段二（未来推演）</strong>：{{ currentYear }} → {{ targetYear }}，使用上方设定的出生率/死亡率驱动。</li>
+            </ul>
+            <p class="mb-1"><strong>逐年计算公式：</strong></p>
+            <ul class="mb-1 ps-3">
+              <li>新生儿 = 总人口 × 出生率 ÷ 1000</li>
+              <li>年龄 n (1-99) = 上一年年龄 n-1 存活者 × (1 − 死亡率 ÷ 1000)</li>
+              <li>100+ 岁 = 99 岁存活者 + 原 100+ 岁存量（假定不再死亡）</li>
+            </ul>
+            <p class="mb-0"><strong>局限：</strong>各年龄段采用统一死亡率；未考虑迁移、年龄别生育率差异等因素，推演结果仅供参考趋势。</p>
+          </div>
+        </details>
 
         <div class="card mb-3">
           <div class="card-header d-flex justify-content-between">
