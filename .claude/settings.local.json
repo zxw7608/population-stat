@@ -1,0 +1,15 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git add *)",
+      "Bash(git commit -m ' *)",
+      "Bash(node -e \"const d = require\\('./src/data/population-history.json'\\); console.log\\('Records:', d.records.length\\); console.log\\('First:', JSON.stringify\\(d.records[0]\\)\\); console.log\\('Last:', JSON.stringify\\(d.records[d.records.length-1]\\)\\); console.log\\('2025:', JSON.stringify\\(d.records.find\\(r=>r.year===2025\\)\\)\\)\")",
+      "Bash(node -e \"const d = require\\('./src/data/base-age-distribution.json'\\); console.log\\('Ages:', d.ages.length\\); const sum = d.ages.reduce\\(\\(s,a\\)=>s+a.count,0\\); console.log\\('Total people:', sum, '=', \\(sum/100000000\\).toFixed\\(2\\), '亿'\\); console.log\\('Sample age 0:', d.ages[0]\\); console.log\\('Sample age 100:', d.ages[100]\\)\")",
+      "Bash(git commit *)",
+      "Bash(node -e \"const files=['src/engine/age-classifier.js','src/engine/population-engine.js','src/engine/data-parser.js','src/components/rate-input.js','src/components/birth-death-chart.js','src/components/age-distribution.js','src/components/age-group-editor.js','src/components/data-manager.js','src/components/simulation-panel.js','src/app.js']; files.forEach\\(f=>{try{require\\('fs'\\).readFileSync\\(f,'utf8'\\); console.log\\('OK:',f\\)}catch\\(e\\){console.log\\('MISSING:',f\\)}}\\)\")",
+      "Bash(npm install *)",
+      "Bash(node -e ' *)",
+      "Bash(node -e \"console.log\\('package.json scripts:', require\\('./package.json'\\).scripts\\)\")"
+    ]
+  }
+}

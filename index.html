@@ -22,13 +22,10 @@
           <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#tab-trend" type="button">历史趋势</button>
         </li>
         <li class="nav-item" role="presentation">
-          <button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-age" type="button">年龄分布</button>
+          <button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-age" type="button">年龄分布与推演</button>
         </li>
         <li class="nav-item" role="presentation">
           <button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-data" type="button">数据管理</button>
-        </li>
-        <li class="nav-item" role="presentation">
-          <button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-sim" type="button">模拟推演</button>
         </li>
       </ul>
       <div class="tab-content">
@@ -41,6 +38,12 @@
             :age-groups="ageGroups"
             :discrepancy-note="baseAgeDistribution?.meta?.discrepancyNote || ''"
           ></age-distribution>
+          <hr class="my-4">
+          <simulation-panel
+            :history-data="populationHistory"
+            :age-distribution="baseAgeDistribution"
+            :age-groups="ageGroups"
+          ></simulation-panel>
         </div>
         <div class="tab-pane fade" id="tab-data">
           <data-manager
@@ -48,13 +51,6 @@
             @update-age-dist="onAgeDistUpdate"
             @update-groups="onGroupsUpdate"
           ></data-manager>
-        </div>
-        <div class="tab-pane fade" id="tab-sim">
-          <simulation-panel
-            :history-data="populationHistory"
-            :age-distribution="baseAgeDistribution"
-            :age-groups="ageGroups"
-          ></simulation-panel>
         </div>
       </div>
     </div>

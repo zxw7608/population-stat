@@ -50,7 +50,7 @@ const SimulationPanel = {
     return {
       birthRate: 5.63,
       deathRate: 8.04,
-      targetYear: 2050,
+      targetYear: null,
       result: null
     };
   },
@@ -60,7 +60,7 @@ const SimulationPanel = {
       if (this.historyData.length) return Math.max(...this.historyData.map(r => r.year));
       return new Date().getFullYear();
     },
-    sliderMin() { return this.currentYear + 1; },
+    sliderMin() { return this.currentYear; },
     baseYear() {
       return this.ageDistribution?.meta?.baseYear || 2000;
     }
@@ -78,7 +78,7 @@ const SimulationPanel = {
   },
   watch: {
     historyData: {
-      handler() { this.resetRates(); this.runSimulation(); },
+      handler() { this.resetRates(); this.initTargetYear(); this.runSimulation(); },
       immediate: true
     },
     birthRate() { this.runSimulation(); },
@@ -88,6 +88,11 @@ const SimulationPanel = {
     ageGroups() { if (this.result) this.renderResultChart(); }
   },
   methods: {
+    initTargetYear() {
+      if (this.targetYear === null && this.historyData.length) {
+        this.targetYear = this.currentYear;
+      }
+    },
     resetRates() {
       if (this.historyData.length) {
         const last = this.historyData.reduce((a, b) => a.year > b.year ? a : b);
@@ -124,6 +129,7 @@ const SimulationPanel = {
       chart = echarts.init(el);
       const groups = classifyByGroups(this.result.distribution, this.ageGroups);
       chart.setOption({
+        animation: false,
         tooltip: { trigger: 'axis' },
         xAxis: { type: 'category', data: groups.map(g => g.name), axisLabel: { rotate: 30 } },
         yAxis: { type: 'value', name: '万人' },

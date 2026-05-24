@@ -41,6 +41,7 @@ const BirthDeathChart = {
       chart = echarts.init(el);
       const sorted = [...this.historyData].sort((a, b) => a.year - b.year);
       chart.setOption({
+        animation: false,
         tooltip: { trigger: 'axis' },
         legend: { data: ['出生人口', '死亡人口'] },
         xAxis: { type: 'category', data: sorted.map(r => r.year) },
@@ -61,6 +62,7 @@ const BirthDeathChart = {
       chart = echarts.init(el);
       const sorted = [...this.historyData].sort((a, b) => a.year - b.year);
       chart.setOption({
+        animation: false,
         tooltip: { trigger: 'axis' },
         legend: { data: ['出生率', '死亡率', '自然增长率'] },
         xAxis: { type: 'category', data: sorted.map(r => r.year) },
