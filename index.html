@@ -34,21 +34,18 @@
         </div>
         <div class="tab-pane fade" id="tab-age">
           <age-distribution
-            :age-distribution="baseAgeDistribution"
+            :distribution="ageDistribution"
             :age-groups="ageGroups"
-            :discrepancy-note="baseAgeDistribution?.meta?.discrepancyNote || ''"
           ></age-distribution>
           <hr class="my-4">
           <simulation-panel
             :history-data="populationHistory"
-            :age-distribution="baseAgeDistribution"
             :age-groups="ageGroups"
           ></simulation-panel>
         </div>
         <div class="tab-pane fade" id="tab-data">
           <data-manager
             @update-history="onHistoryUpdate"
-            @update-age-dist="onAgeDistUpdate"
             @update-groups="onGroupsUpdate"
           ></data-manager>
         </div>
@@ -60,6 +57,7 @@
   <script src="src/engine/age-classifier.js"></script>
   <script src="src/engine/population-engine.js"></script>
   <script src="src/engine/data-parser.js"></script>
+  <script src="src/engine/cohort-calculator.js"></script>
   <script src="src/components/rate-input.js"></script>
   <script src="src/components/birth-death-chart.js"></script>
   <script src="src/components/age-distribution.js"></script>

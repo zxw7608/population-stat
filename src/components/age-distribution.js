@@ -1,15 +1,11 @@
 const AgeDistribution = {
   props: {
-    ageDistribution: { type: Object, default: null },
-    ageGroups: { type: Array, default: () => [] },
-    discrepancyNote: { type: String, default: '' }
+    distribution: { type: Array, default: () => [] },
+    ageGroups: { type: Array, default: () => [] }
   },
   template: `
     <div>
-      <div v-if="discrepancyNote" class="alert alert-warning py-2">
-        ⚠ {{ discrepancyNote }}
-      </div>
-      <div v-if="ageDistribution">
+      <div v-if="hasDistribution">
         <div class="row">
           <div class="col-md-6">
             <div ref="groupChart" style="height: 400px;"></div>
@@ -19,15 +15,21 @@ const AgeDistribution = {
           </div>
         </div>
       </div>
-      <div v-else class="alert alert-secondary">请先在"数据管理"页面上传年龄分布数据</div>
+      <div v-else class="alert alert-secondary">请先在"数据管理"页面上传逐年数据</div>
     </div>
   `,
+  computed: {
+    hasDistribution() { return this.distribution && this.distribution.length > 0; },
+    ages() {
+      return this.distribution.map((count, age) => ({ age, count }));
+    }
+  },
   watch: {
-    ageDistribution() { this.renderCharts(); },
+    distribution() { this.renderCharts(); },
     ageGroups() { this.renderCharts(); }
   },
   mounted() {
-    if (this.ageDistribution) this.renderCharts();
+    if (this.hasDistribution) this.renderCharts();
     this._onTabShow = () => this.$nextTick(() => this.renderCharts());
     document.querySelectorAll('[data-bs-toggle="tab"]').forEach(tab =>
       tab.addEventListener('shown.bs.tab', this._onTabShow)
@@ -49,8 +51,7 @@ const AgeDistribution = {
       let chart = echarts.getInstanceByDom(el);
       if (chart) chart.dispose();
       chart = echarts.init(el);
-      const dist = this.ageDistribution.ages.map(a => a.count);
-      const groups = classifyByGroups(dist, this.ageGroups);
+      const groups = classifyByGroups(this.distribution, this.ageGroups);
       chart.setOption({
         animation: false,
         title: { text: '按分组', left: 'center' },
@@ -67,7 +68,7 @@ const AgeDistribution = {
       let chart = echarts.getInstanceByDom(el);
       if (chart) chart.dispose();
       chart = echarts.init(el);
-      const ages = this.ageDistribution.ages;
+      const ages = this.ages;
       chart.setOption({
         animation: false,
         title: { text: '按每岁', left: 'center' },
@@ -76,7 +77,7 @@ const AgeDistribution = {
         yAxis: { type: 'value', name: '万人' },
         series: [{
           type: 'bar',
-          data: ages.map(a => Math.round(a.count / 100) / 100),
+          data: ages.map(a => Math.round(a.count * 100) / 100),
           itemStyle: { color: '#1976D2' }
         }],
         grid: { left: 60, right: 20, top: 50, bottom: 50 },

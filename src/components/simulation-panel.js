@@ -1,13 +1,12 @@
 const SimulationPanel = {
   props: {
     historyData: { type: Array, default: () => [] },
-    ageDistribution: { type: Object, default: null },
     ageGroups: { type: Array, default: () => [] }
   },
   template: `
     <div>
       <div v-if="!hasBaseData" class="alert alert-warning">
-        请先在"数据管理"页面上传年龄分布数据
+        请先在"数据管理"页面上传逐年数据
       </div>
       <div v-else>
         <div class="d-flex gap-3 align-items-end mb-3 flex-wrap">
@@ -33,19 +32,16 @@ const SimulationPanel = {
         <details class="mb-3 small text-muted">
           <summary class="user-select-none cursor-pointer">推演算法说明</summary>
           <div class="card card-body bg-light mt-2">
-            <p class="mb-1"><strong>数据基准：</strong>{{ baseYear }} 年人口普查年龄分布（0-100+ 岁，共 101 个年龄槽位）。</p>
-            <p class="mb-1"><strong>两阶段推演：</strong></p>
-            <ul class="mb-1 ps-3">
-              <li><strong>阶段一（历史回放）</strong>：{{ baseYear }} → {{ currentYear }}，逐年使用实际历史出生率/死亡率驱动。</li>
-              <li><strong>阶段二（未来推演）</strong>：{{ currentYear }} → {{ targetYear }}，使用上方设定的出生率/死亡率驱动。</li>
-            </ul>
+            <p class="mb-1"><strong>数据基准：</strong>从逐年出生/死亡数据推算的 {{ currentYear }} 年年龄分布（队列追踪法）。</p>
+            <p class="mb-1"><strong>队列追踪法：</strong>每个出生年份的队列 × 逐年存活率(1−死亡率/1000) 累积至 {{ currentYear }}，{{ earliestYear }} 年前出生者以残差归入 {{ preDataAge }}+ 岁。</p>
+            <p class="mb-1"><strong>推演：</strong>{{ currentYear }} → {{ targetYear }}，逐年使用上方设定的出生率/死亡率驱动。</p>
             <p class="mb-1"><strong>逐年计算公式：</strong></p>
             <ul class="mb-1 ps-3">
               <li>新生儿 = 总人口 × 出生率 ÷ 1000</li>
               <li>年龄 n (1-99) = 上一年年龄 n-1 存活者 × (1 − 死亡率 ÷ 1000)</li>
-              <li>100+ 岁 = 99 岁存活者 + 原 100+ 岁存量（假定不再死亡）</li>
+              <li>100+ 岁 = 99 岁存活者 + 原 100+ 岁存量</li>
             </ul>
-            <p class="mb-0"><strong>局限：</strong>各年龄段采用统一死亡率；未考虑迁移、年龄别生育率差异等因素，推演结果仅供参考趋势。</p>
+            <p class="mb-0"><strong>局限：</strong>各年龄段采用统一死亡率；队列均用各自出生年人数，未考虑各年间死亡率的年龄差异。推演结果仅供参考趋势。</p>
           </div>
         </details>
 
@@ -70,14 +66,20 @@ const SimulationPanel = {
     };
   },
   computed: {
-    hasBaseData() { return this.ageDistribution && this.ageDistribution.ages; },
+    hasBaseData() { return this.historyData.length > 0; },
     currentYear() {
       if (this.historyData.length) return Math.max(...this.historyData.map(r => r.year));
       return new Date().getFullYear();
     },
+    earliestYear() {
+      if (this.historyData.length) return Math.min(...this.historyData.map(r => r.year));
+      return 1949;
+    },
+    preDataAge() { return this.currentYear - this.earliestYear + 1; },
     sliderMin() { return this.currentYear; },
-    baseYear() {
-      return this.ageDistribution?.meta?.baseYear || 2000;
+    baseDistribution() {
+      if (!this.historyData.length) return [];
+      return calculateCohortDistribution(this.historyData);
     }
   },
   mounted() {
@@ -99,7 +101,6 @@ const SimulationPanel = {
     birthRate() { this.runSimulation(); },
     deathRate() { this.runSimulation(); },
     targetYear() { this.runSimulation(); },
-    ageDistribution() { this.runSimulation(); },
     ageGroups() { if (this.result) this.renderResultChart(); }
   },
   methods: {
@@ -116,21 +117,13 @@ const SimulationPanel = {
       }
     },
     runSimulation() {
-      if (!this.hasBaseData || !this.historyData.length) return;
-
-      const dist = this.ageDistribution.ages.map(a => a.count);
-      const histRates = this.historyData
-        .filter(r => r.year >= this.baseYear)
-        .sort((a,b) => a.year - b.year)
-        .map(r => ({ year: r.year, birthRate: r.birthRate, deathRate: r.deathRate }));
+      if (!this.hasBaseData) return;
 
       this.result = simulate({
-        baseDistribution: dist,
-        historicalRates: histRates,
-        projectionBirthRate: this.birthRate,
-        projectionDeathRate: this.deathRate,
-        baseYear: this.baseYear,
-        currentYear: this.currentYear,
+        baseDistribution: this.baseDistribution,
+        birthRate: this.birthRate,
+        deathRate: this.deathRate,
+        startYear: this.currentYear,
         targetYear: this.targetYear
       });
       this.$nextTick(() => this.renderResultChart());

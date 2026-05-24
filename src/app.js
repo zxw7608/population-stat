@@ -4,13 +4,17 @@ const App = {
   data() {
     return {
       populationHistory: [],
-      baseAgeDistribution: null,
       ageGroups: []
     };
   },
+  computed: {
+    ageDistribution() {
+      if (!this.populationHistory.length) return [];
+      return calculateCohortDistribution(this.populationHistory);
+    }
+  },
   methods: {
     onHistoryUpdate(records) { this.populationHistory = records; },
-    onAgeDistUpdate(data) { this.baseAgeDistribution = data; },
     onGroupsUpdate(groups) { this.ageGroups = groups; }
   }
 };
