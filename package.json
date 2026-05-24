@@ -3,7 +3,8 @@
   "version": "1.0.0",
   "description": "人口统计可视化",
   "scripts": {
-    "convert": "node scripts/convert.js"
+    "convert": "node scripts/convert.js",
+    "dev": "node scripts/dev-server.js"
   },
   "dependencies": {
     "xlsx": "^0.18.5"
