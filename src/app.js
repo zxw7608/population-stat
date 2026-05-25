@@ -4,7 +4,8 @@ const App = {
   data() {
     return {
       populationHistory: [],
-      ageGroups: []
+      ageGroups: [],
+      mortalityRates: []
     };
   },
   computed: {
@@ -16,6 +17,14 @@ const App = {
   methods: {
     onHistoryUpdate(records) { this.populationHistory = records; },
     onGroupsUpdate(groups) { this.ageGroups = groups; }
+  },
+  async mounted() {
+    try {
+      const resp = await fetch('src/data/mortality-rates.json');
+      this.mortalityRates = await resp.json();
+    } catch (e) {
+      console.log('死亡率数据加载失败，使用空数组');
+    }
   }
 };
 

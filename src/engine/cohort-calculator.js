@@ -33,7 +33,7 @@ function calculateCohortDistribution(records) {
     trackedTotal += cohort;
   }
 
-  // 残差 = 出生早于 earliestYear 的存活人口
+  // 残差 = 出生早于 earliestYear 的存活人口，归入最年轻可能的年龄
   const residual = sorted[sorted.length - 1].totalPopulation - trackedTotal;
   const preDataAge = Math.min(latestYear - earliestYear + 1, 100);
   dist[preDataAge] = Math.max(0, residual);
